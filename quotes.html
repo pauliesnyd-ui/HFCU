@@ -58,7 +58,10 @@
 document.getElementById("quote").textContent =
   quotes[index].text.replace(/[“”"]/g, "").trim();
 
-  document.getElementById("author").textContent = "— " + quotes[index].author;
+
+document.getElementById("author").textContent =
+  "— " + quotes[index].author.replace(/[“”"]/g, "").trim();
+
 
 })();
 </script>
