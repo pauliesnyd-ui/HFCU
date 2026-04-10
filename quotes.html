@@ -54,7 +54,10 @@
   const seed = Number(today.replace(/-/g, ""));
   const index = seed % quotes.length;
 
-  document.getElementById("quote").textContent = quotes[index].text;
+
+document.getElementById("quote").textContent =
+  quotes[index].text.replace(/[“”"]/g, "").trim();
+
   document.getElementById("author").textContent = "— " + quotes[index].author;
 
 })();
