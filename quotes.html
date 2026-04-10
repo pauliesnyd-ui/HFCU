@@ -40,24 +40,44 @@
 <script>
 (async function () {
   const today = new Date().toISOString().split("T")[0];
-  const savedDate = localStorage.getItem("quoteDate");
 
-  if (savedDate !== today) {
-    const response = await fetch(
-      "https://api.quotable.io/random?tags=inspirational|success|happiness"
-    );
-    const data = await response.json();
+  const fallback = {
+    text: "Great things are done by a series of small things brought together.",
+    author: "Vincent Van Gogh"
+  };
 
-    localStorage.setItem("quoteText", data.content);
-    localStorage.setItem("quoteAuthor", data.author);
-    localStorage.setItem("quoteDate", today);
+  try {
+    const storedDate = localStorage.getItem("quoteDate");
+
+    if (storedDate !== today) {
+      const controller = new AbortController();
+      setTimeout(() => controller.abort(), 3000); // 3s timeout
+
+      const response = await fetch(
+        "https://api.quotable.io/random?tags=inspirational|success|happiness",
+        { signal: controller.signal }
+      );
+
+      if (!response.ok) throw new Error("Bad response");
+
+      const data = await response.json();
+
+      localStorage.setItem("quoteText", data.content);
+      localStorage.setItem("quoteAuthor", data.author);
+      localStorage.setItem("quoteDate", today);
+    }
+
+    document.getElementById("quote").textContent =
+      localStorage.getItem("quoteText") || fallback.text;
+
+    document.getElementById("author").textContent =
+      "— " + (localStorage.getItem("quoteAuthor") || fallback.author);
+
+  } catch (err) {
+    // API failed — show fallback immediately
+    document.getElementById("quote").textContent = fallback.text;
+    document.getElementById("author").textContent = "— " + fallback.author;
   }
-
-  document.getElementById("quote").textContent =
-    localStorage.getItem("quoteText");
-
-  document.getElementById("author").textContent =
-    "— " + localStorage.getItem("quoteAuthor");
 })();
 </script>
 
